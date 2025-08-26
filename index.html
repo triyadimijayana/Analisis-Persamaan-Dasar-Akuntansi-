@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Persamaan Dasar Akuntansi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .answer-btn-group .selected {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: white;
+            border-color: #2563eb; /* border-blue-600 */
+        }
+        .table-auto th, .table-auto td {
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="app-container" class="w-full max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-4 text-lg font-medium">Memuat data...</p>
+        </div>
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="hidden">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600">Kuis Akuntansi Dasar</h1>
+            <p class="text-center mt-4 text-slate-600">Uji pemahamanmu tentang pengaruh transaksi terhadap persamaan dasar akuntansi:</p>
+            <div class="my-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+                <p class="text-xl sm:text-2xl font-semibold">Aset = Liabilitas + Ekuitas</p>
+            </div>
+            <div class="text-left max-w-md mx-auto space-y-3">
+                <p><span class="font-bold text-green-600">(+)</span> : Menandakan akun tersebut <strong>bertambah</strong>.</p>
+                <p><span class="font-bold text-red-600">(-)</span> : Menandakan akun tersebut <strong>berkurang</strong>.</p>
+                <p><span class="font-bold text-slate-600">(o)</span> : Menandakan akun tersebut <strong>tidak berubah</strong> atau tidak terpengaruh.</p>
+            </div>
+            <div class="mt-8 text-center">
+                <button id="start-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors text-lg">
+                    Mulai Kuis
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-blue-600">Soal <span id="question-number">1</span>/30</h2>
+                <div id="progress-bar-container" class="w-1/2 bg-slate-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="bg-slate-100 p-6 rounded-lg my-4 min-h-[100px] flex items-center justify-center">
+                <p id="question-text" class="text-center text-lg font-medium"></p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <!-- Aset -->
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3">Aset</h3>
+                    <div class="flex justify-center space-x-2 answer-btn-group" data-component="asset">
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="+">+</button>
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="-">-</button>
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="o">o</button>
+                    </div>
+                </div>
+                <!-- Liabilitas -->
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3">Liabilitas</h3>
+                    <div class="flex justify-center space-x-2 answer-btn-group" data-component="liability">
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="+">+</button>
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="-">-</button>
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="o">o</button>
+                    </div>
+                </div>
+                <!-- Ekuitas -->
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3">Ekuitas</h3>
+                    <div class="flex justify-center space-x-2 answer-btn-group" data-component="equity">
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="+">+</button>
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="-">-</button>
+                        <button class="w-12 h-12 border-2 border-slate-300 rounded-full font-bold text-xl hover:bg-slate-200 transition-colors" data-value="o">o</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="next-question-btn" class="bg-blue-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed">
+                    Lanjut
+                </button>
+            </div>
+        </div>
+
+        <!-- Score Screen -->
+        <div id="score-screen" class="hidden">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-600">Hasil Kuis</h1>
+            <div class="text-center my-6">
+                <p class="text-lg">Skor Akhir Anda:</p>
+                <p class="text-5xl font-bold my-2"><span id="final-score">0</span> / 30</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="table-auto w-full border-collapse border border-slate-300 mt-4">
+                    <thead class="bg-slate-100">
+                        <tr>
+                            <th class="p-3 border border-slate-300">No</th>
+                            <th class="p-3 border border-slate-300">Transaksi</th>
+                            <th class="p-3 border border-slate-300">Jawaban Anda</th>
+                            <th class="p-3 border border-slate-300">Kunci</th>
+                            <th class="p-3 border border-slate-300">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <!-- Results will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="restart-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors text-lg">
+                    Ulangi Kuis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import fungsi-fungsi Firebase yang dibutuhkan
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Konfigurasi Firebase (akan diisi secara otomatis oleh environment)
+        const firebaseConfig = {
+  apiKey: "AIzaSyB5iHvwkciNmDXUMhNDf38_Ff9cphO38BA",
+  authDomain: "akuntansi-dasar.firebaseapp.com",
+  projectId: "akuntansi-dasar",
+  storageBucket: "akuntansi-dasar.firebasestorage.app",
+  messagingSenderId: "519490226272",
+  appId: "1:519490226272:web:aaceb10e56b010aaac1b05"
+};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Daftar 30 soal kuis
+        const questions = [
+            { transaction: "Pemilik menyetor uang tunai Rp50.000.000 sebagai modal awal.", answer: { asset: '+', liability: 'o', equity: '+' } },
+            { transaction: "Membeli peralatan kantor secara kredit seharga Rp10.000.000.", answer: { asset: '+', liability: '+', equity: 'o' } },
+            { transaction: "Membayar sewa kantor untuk satu bulan sebesar Rp2.000.000.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Menerima pendapatan jasa secara tunai sebesar Rp5.000.000.", answer: { asset: '+', liability: 'o', equity: '+' } },
+            { transaction: "Membeli perlengkapan habis pakai secara tunai Rp1.000.000.", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (kas) berkurang, Aset (perlengkapan) bertambah -> net 'o'
+            { transaction: "Membayar sebagian utang usaha sebesar Rp3.000.000.", answer: { asset: '-', liability: '-', equity: 'o' } },
+            { transaction: "Menyelesaikan jasa untuk klien dan mengirimkan tagihan Rp7.000.000.", answer: { asset: '+', liability: 'o', equity: '+' } }, // Aset (piutang) bertambah
+            { transaction: "Membayar gaji karyawan sebesar Rp4.000.000.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Pemilik mengambil uang tunai untuk keperluan pribadi (prive) Rp500.000.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Menerima pembayaran dari klien atas tagihan sebelumnya Rp2.000.000.", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (kas) bertambah, Aset (piutang) berkurang -> net 'o'
+            { transaction: "Meminjam uang dari bank sebesar Rp20.000.000.", answer: { asset: '+', liability: '+', equity: 'o' } },
+            { transaction: "Membayar tagihan listrik dan air sebesar Rp750.000.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Membeli kendaraan operasional secara tunai seharga Rp100.000.000.", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (kas) berkurang, Aset (kendaraan) bertambah -> net 'o'
+            { transaction: "Menjual peralatan lama yang tidak terpakai secara tunai (sesuai nilai buku).", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (peralatan) berkurang, Aset (kas) bertambah -> net 'o'
+            { transaction: "Menerima pendapatan jasa di muka (belum dikerjakan) Rp1.500.000.", answer: { asset: '+', liability: '+', equity: 'o' } },
+            { transaction: "Menggunakan perlengkapan habis pakai yang telah dibeli sebelumnya.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Membayar cicilan pinjaman bank beserta bunganya.", answer: { asset: '-', liability: '-', equity: '-' } }, // Bunga adalah beban
+            { transaction: "Pemilik menyetorkan peralatan pribadi ke dalam perusahaan sebagai tambahan modal.", answer: { asset: '+', liability: 'o', equity: '+' } },
+            { transaction: "Membayar premi asuransi untuk satu tahun ke depan (asuransi dibayar di muka).", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (kas) berkurang, Aset (asuransi dibayar di muka) bertambah -> net 'o'
+            { transaction: "Menghapuskan piutang tak tertagih.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Membeli tanah untuk investasi masa depan secara kredit.", answer: { asset: '+', liability: '+', equity: 'o' } },
+            { transaction: "Menerima pinjaman dari perusahaan lain (utang wesel).", answer: { asset: '+', liability: '+', equity: 'o' } },
+            { transaction: "Membayar biaya iklan di koran lokal secara tunai.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Perusahaan mengumumkan dan membagikan dividen kepada pemilik.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Membeli saham perusahaan lain sebagai investasi jangka pendek.", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (kas) berkurang, Aset (investasi) bertambah -> net 'o'
+            { transaction: "Menyelesaikan jasa yang pendapatannya diterima di muka sebelumnya.", answer: { asset: 'o', liability: '-', equity: '+' } },
+            { transaction: "Membayar pajak penghasilan perusahaan.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Menerima bunga dari simpanan di bank.", answer: { asset: '+', liability: 'o', equity: '+' } },
+            { transaction: "Membayar biaya perbaikan kendaraan operasional.", answer: { asset: '-', liability: 'o', equity: '-' } },
+            { transaction: "Menukarkan kendaraan lama dengan kendaraan baru, dengan menambah uang tunai.", answer: { asset: 'o', liability: 'o', equity: 'o' } }, // Aset (kendaraan lama) berkurang, Aset (kas) berkurang, Aset (kendaraan baru) bertambah -> net 'o'
+        ];
+
+        // Variabel state aplikasi
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let currentSelection = { asset: null, liability: null, equity: null };
+        let userId = null;
+        let quizStateRef = null;
+        let unsubscribe = null; // Untuk listener onSnapshot
+
+        // Referensi elemen DOM
+        const screens = {
+            loading: document.getElementById('loading-screen'),
+            start: document.getElementById('start-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            score: document.getElementById('score-screen'),
+        };
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const progressBar = document.getElementById('progress-bar');
+        const answerBtnGroups = document.querySelectorAll('.answer-btn-group');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const finalScoreEl = document.getElementById('final-score');
+        const resultsTableBody = document.getElementById('results-table-body');
+        const restartQuizBtn = document.getElementById('restart-quiz-btn');
+
+        // Fungsi untuk menampilkan layar tertentu
+        const showScreen = (screenName) => {
+            Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+            screens[screenName].classList.remove('hidden');
+        };
+
+        // Fungsi untuk mengautentikasi pengguna dan memulai aplikasi
+        const initializeAppWithAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser.uid;
+                quizStateRef = doc(db, `artifacts/${appId}/users/${userId}/quizState`);
+                
+                // Setup listener untuk perubahan data real-time
+                setupSnapshotListener();
+
+            } catch (error) {
+                console.error("Authentication or Firestore setup failed:", error);
+                showScreen('start'); // Tampilkan start screen jika ada error
+            }
+        };
+
+        // Fungsi untuk mendengarkan perubahan data dari Firestore
+        const setupSnapshotListener = () => {
+             if (unsubscribe) unsubscribe(); // Hentikan listener lama jika ada
+
+             unsubscribe = onSnapshot(quizStateRef, (docSnap) => {
+                showScreen('start'); // Default ke start screen
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentQuestionIndex = data.currentQuestionIndex || 0;
+                    userAnswers = data.userAnswers || Array(questions.length).fill(null);
+                    
+                    if (currentQuestionIndex < questions.length && currentQuestionIndex > 0) {
+                        // Jika kuis sedang berlangsung, lanjutkan
+                        startQuiz(false); // false berarti tidak mereset state
+                    } else if (currentQuestionIndex >= questions.length) {
+                        // Jika kuis sudah selesai, tampilkan skor
+                        displayScore();
+                    }
+                } else {
+                    // Jika tidak ada data, mulai dari awal
+                    resetQuizState();
+                }
+             }, (error) => {
+                 console.error("Error listening to quiz state:", error);
+                 showScreen('start');
+             });
+        };
+
+        // Fungsi untuk menyimpan state ke Firebase
+        const saveStateToFirebase = async () => {
+            if (!quizStateRef) return;
+            try {
+                await setDoc(quizStateRef, {
+                    currentQuestionIndex,
+                    userAnswers
+                });
+            } catch (error) {
+                console.error("Error saving state:", error);
+            }
+        };
+
+        // Fungsi untuk mereset state kuis
+        const resetQuizState = () => {
+            currentQuestionIndex = 0;
+            userAnswers = Array(questions.length).fill(null);
+        };
+        
+        // Fungsi untuk memulai kuis
+        const startQuiz = (shouldReset = true) => {
+            if (shouldReset) {
+                resetQuizState();
+                saveStateToFirebase();
+            }
+            showScreen('quiz');
+            displayQuestion();
+        };
+
+        // Fungsi untuk menampilkan soal
+        const displayQuestion = () => {
+            if (currentQuestionIndex >= questions.length) {
+                displayScore();
+                return;
+            }
+            
+            // Reset pilihan
+            currentSelection = { asset: null, liability: null, equity: null };
+            nextQuestionBtn.disabled = true;
+
+            // Update UI
+            const question = questions[currentQuestionIndex];
+            questionNumberEl.textContent = currentQuestionIndex + 1;
+            questionTextEl.textContent = question.transaction;
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Reset tampilan tombol jawaban
+            answerBtnGroups.forEach(group => {
+                group.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            });
+        };
+
+        // Fungsi untuk menangani pilihan jawaban
+        const handleAnswerSelection = (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const group = target.closest('.answer-btn-group');
+            const component = group.dataset.component;
+            const value = target.dataset.value;
+
+            // Update state pilihan
+            currentSelection[component] = value;
+
+            // Update UI tombol
+            group.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+            target.classList.add('selected');
+
+            // Aktifkan tombol 'Lanjut' jika semua sudah dipilih
+            if (Object.values(currentSelection).every(val => val !== null)) {
+                nextQuestionBtn.disabled = false;
+            }
+        };
+
+        // Fungsi untuk lanjut ke soal berikutnya
+        const nextQuestion = () => {
+            userAnswers[currentQuestionIndex] = { ...currentSelection };
+            currentQuestionIndex++;
+            saveStateToFirebase(); // Simpan state setelah menjawab
+            displayQuestion();
+        };
+
+        // Fungsi untuk menampilkan skor akhir
+        const displayScore = () => {
+            showScreen('score');
+            let score = 0;
+            resultsTableBody.innerHTML = ''; // Kosongkan tabel
+
+            questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer && 
+                                  userAnswer.asset === q.answer.asset &&
+                                  userAnswer.liability === q.answer.liability &&
+                                  userAnswer.equity === q.answer.equity;
+
+                if (isCorrect) score++;
+
+                const userAnswerText = userAnswer ? `A:${userAnswer.asset} L:${userAnswer.liability} E:${userAnswer.equity}` : 'Tidak Dijawab';
+                const correctAnswerText = `A:${q.answer.asset} L:${q.answer.liability} E:${q.answer.equity}`;
+                
+                const row = `
+                    <tr class="${isCorrect ? 'bg-green-50' : 'bg-red-50'}">
+                        <td class="p-2 border border-slate-300">${index + 1}</td>
+                        <td class="p-2 border border-slate-300 text-left">${q.transaction}</td>
+                        <td class="p-2 border border-slate-300 font-mono">${userAnswerText}</td>
+                        <td class="p-2 border border-slate-300 font-mono">${correctAnswerText}</td>
+                        <td class="p-2 border border-slate-300">${isCorrect ? '✅' : '❌'}</td>
+                    </tr>
+                `;
+                resultsTableBody.innerHTML += row;
+            });
+
+            finalScoreEl.textContent = score;
+        };
+
+        // Fungsi untuk mengulang kuis
+        const restartQuiz = () => {
+            startQuiz(true);
+        };
+
+        // Event Listeners
+        startQuizBtn.addEventListener('click', () => startQuiz(true));
+        nextQuestionBtn.addEventListener('click', nextQuestion);
+        restartQuizBtn.addEventListener('click', restartQuiz);
+        answerBtnGroups.forEach(group => {
+            group.addEventListener('click', handleAnswerSelection);
+        });
+
+        // Mulai aplikasi
+        initializeAppWithAuth();
+    </script>
+</body>
+</html>
